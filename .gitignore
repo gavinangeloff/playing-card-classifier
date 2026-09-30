@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# Dataset (downloaded from Kaggle)
+card_data/
+
+# Training outputs (the chosen model lives in models/)
+trained_model1/
+model1_plots/
+
+# Editor / OS
+.vscode/
+.DS_Store
