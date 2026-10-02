@@ -92,21 +92,10 @@ classes = [
 
 # Load Data
 
-transform = transforms.Compose([
-    transforms.Resize((200, 200)), # Adjust size to match your training input
-    transforms.ToTensor()
-])
-
-test_set = datasets.ImageFolder(
-    root='card_data/test', transform=transform
-)
-
-testloader = torch.utils.data.DataLoader(test_set, batch_size=32,
-                                        shuffle=True) # if too many workers, child processes will disrupt python
-
-# iter data for retrieval
-dataiter = iter(testloader)
-images, labels = next(dataiter)
+# transform = transforms.Compose([
+#     transforms.Resize((200, 200)), # Adjust size to match your training input
+#     transforms.ToTensor()
+# ])
 
 # Make network class, then load weights 
 net = CardClassifier(53)
@@ -114,22 +103,7 @@ net.load_state_dict(torch.load("models/card_classifier.pth", map_location=device
 net.eval() # Without setting eval mode the batch norm layers will shift their mean and std, destroying model evaluation usefulness in the process
 
 # torchinfo summary
-# Batch, Color, Height, Width, backward from tensorflow
-#input_size = (32, 3, 200, 200) # didn't work for some reason, not sure if torchinfo is running this imaginary input through the network or what, seems to be a problem with where the model is stored
-summary(net,) #input_size=input_size)
-
-# Predictions
-
-print('GroundTruth: ', ' '.join(f'{classes[labels[j]]:5s}, ' for j in range(4)))
-
-# raw outputs
-outputs = net(images)
-
-# max energy output (argmax or onehot)
-_, predicted = torch.max(outputs, 1) # _ is the torch tensor output
-
-print('Predicted: ', ' '.join(f'{classes[predicted[j]]:5s}, '
-                            for j in range(4)))
+summary(net) 
 
 
 #INTERACTIVE PART
