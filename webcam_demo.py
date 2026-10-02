@@ -1,4 +1,4 @@
-# This python program runs an open 
+# This python program runs opencv to capture a frame of a camera, which then is run through the model live and the class prediction of the frame is returned in a new window
 
 # https://docs.pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
 # https://www.geeksforgeeks.org/python/python-opencv-capture-video-from-camera/#
@@ -10,12 +10,7 @@
 
 import torch
 import sys
-import matplotlib.pyplot as plt
-import pandas as pd
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-from torch import nn
-import torchvision
+from torchvision import transforms
 import cv2
 from torchinfo import summary
 # Class from training
@@ -29,9 +24,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 print(f"Device: {device}")
 
-
 #MODEL
-
 model_path = "models/card_classifier.pth"
 
 classes = [
@@ -90,21 +83,18 @@ classes = [
     "two of spades"
 ]
 
-# Load Data
-
-# transform = transforms.Compose([
-#     transforms.Resize((200, 200)), # Adjust size to match your training input
-#     transforms.ToTensor()
-# ])
-
 # Make network class, then load weights 
 net = CardClassifier(53)
-net.load_state_dict(torch.load("models/card_classifier.pth", map_location=device, weights_only=True))
+net.load_state_dict(torch.load(model_path, map_location=device, weights_only=True))
+net.to(device)
 net.eval() # Without setting eval mode the batch norm layers will shift their mean and std, destroying model evaluation usefulness in the process
 
 # torchinfo summary
-summary(net) 
-
+print()
+print("MODEL SUMMARY: ")
+summary(net, input_size=(1, 3, 200, 200), device=device) 
+print()
+print()
 
 #INTERACTIVE PART
 
@@ -119,13 +109,10 @@ def predict_card(frame):
     # Tensor frame from this point on
     tframe = transforms.ToTensor()(color_flop_frame)
     tframe = transforms.Resize((200, 200))(tframe) # resize 
-    tframe = tframe.unsqueeze(0) # adds batch dimension: (1, C, H, W) for the 4D tensor the eval network requires
-    print(tframe.shape)
-    output = net(tframe)
-    print(output.shape)
-    print(output)
+    tframe = tframe.unsqueeze(0).to(device) # adds batch dimension: (1, C, H, W) for the 4D tensor the eval network requires
+    with torch.no_grad():
+        output = net(tframe)
     _, predicted = torch.max(output, 1) # TODO: maybe do softmax output? Then you could see second closest prediction. 
-    print(_)
     amax = classes[predicted]
     return amax
 
@@ -133,7 +120,6 @@ def frame_setup(amax, frame):
     # https://docs.opencv.org/4.x/d6/d6e/group__imgproc__draw.html
     # https://www.geeksforgeeks.org/python/python-opencv-cv2-puttext-method/
 
-    # reminds me of javascript and divs :(
     border_size = 40 
     frame = cv2.copyMakeBorder(frame, border_size, border_size+50, border_size, border_size, cv2.BORDER_CONSTANT, value=(135,135,135))
 
@@ -161,23 +147,22 @@ def frame_setup(amax, frame):
 print("Booting Camera...")
 cam = cv2.VideoCapture(0)
 
-# Get the default frame width and height
-frame_width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
-frame_height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
 i=0
 while True:
     ret, frame = cam.read()
 
+    # camera isn't working
+    if not ret:
+        print("Couldn't read from camera")
+        break
+
     # Display the captured frame
     cv2.imshow('Camera', frame)
     
-    # Write img to file
-    #print("looking for input...")
-    if cv2.waitKey(1) == ord(" "):
-        # Press space for 1 sec to take photo and predict
+    key = cv2.waitKey(1)
+    if key == ord(" "):
+        # Press space to take photo and predict
         print(f"picture{i} taken!")
-        #cv2.imwrite(f'img_out/picture{i}.jpg', frame) # Save img
 
         # Predict Class With Image
         amax = predict_card(frame)
@@ -185,16 +170,11 @@ while True:
 
         i=i+1 # increment
 
-    if cv2.waitKey(1) == ord('q') or cv2.waitKey(1) == ord('Q'):
-        # Press 'q' for 1 sec to exit the loop
+    if key == ord('q') or key == ord('Q'):
+        # Press 'q' to exit the loop
         print("quitting")
         break
 
-# Release the capture and writer objects
+# Release the capture camera and close windows
 cam.release()
-#out.release()
 cv2.destroyAllWindows()
-
-
-
-

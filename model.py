@@ -1,14 +1,5 @@
 import torch
-import sys
-import matplotlib.pyplot as plt
-import pandas as pd
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
 from torch import nn
-import torchvision
-from torchinfo import summary
-
-# I moved this class here after building, so some of the other python file comments might not line up
 
 class CardClassifier(nn.Module):
     def __init__(self, num_classes):
