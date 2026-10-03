@@ -51,15 +51,25 @@ The model predicts the card, and the softmax function turns its logits into a co
 ### Setup and usage
 Requirements: Python 3.12+
 
-**Install:**
+**Install (Windows):**
 
     git clone https://github.com/gavinangeloff/playing-card-classifier.git
     cd playing-card-classifier
     python -m venv .venv
-    .venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+    .venv\Scripts\activate          
     pip install -r requirements.txt
     
-GPU note: on Windows, the default pip install gives you CPU-only PyTorch. GPU users should get the install command from [pytorch.org/get-started/locally](https://pytorch.org/get-started/locally/).
+**Install (Linux, MacOS):**
+
+    git clone https://github.com/gavinangeloff/playing-card-classifier.git
+    cd playing-card-classifier
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+
+GPU note: The default pip install gives you CPU-only PyTorch. GPU users should get the install command from [pytorch.org/get-started/locally](https://pytorch.org/get-started/locally/).
+
+
 
 **Run the demo (no dataset needed, the trained model is included):**
 
