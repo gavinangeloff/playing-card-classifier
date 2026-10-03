@@ -112,9 +112,13 @@ def predict_card(frame):
     tframe = tframe.unsqueeze(0).to(device) # adds batch dimension: (1, C, H, W) for the 4D tensor the eval network requires
     with torch.no_grad():
         output = net(tframe)
-    _, predicted = torch.max(output, 1) # TODO: maybe do softmax output? Then you could see second closest prediction. 
-    amax = classes[predicted]
-    return amax
+    _, amax = torch.max(output, 1) # amax is a tensor with the index for the one that was the largest number
+    amax_class = classes[amax]
+
+    softmax_tensor = torch.softmax(output, dim=1)
+    softmax_list = list(zip(classes, softmax_tensor[0].tolist())) # [0] for the values and not the batch dimension
+    
+    return amax, amax_class, softmax_list
 
 def frame_setup(amax, frame):   
     # https://docs.opencv.org/4.x/d6/d6e/group__imgproc__draw.html
@@ -139,6 +143,7 @@ def frame_setup(amax, frame):
 
     cv2.namedWindow(amax, cv2.WINDOW_NORMAL) # manually resizing window
     cv2.resizeWindow(amax, 800, 800) # auto start large
+    cv2.moveWindow(amax, 40, 40) # move to same spot each time
     cv2.imshow(amax, frame) # Show image
 
 # Interactive Camera Part
@@ -162,12 +167,14 @@ while True:
     key = cv2.waitKey(1)
     if key == ord(" "):
         # Press space to take photo and predict
-        print(f"picture{i} taken!")
 
         # Predict Class With Image
-        amax = predict_card(frame)
-        frame_setup(f"pic{i}: {amax}", frame)
-
+        amax, amax_class, softmax_list = predict_card(frame)
+        frame_setup(f"{amax_class}: {softmax_list[amax][1]:.3%}", frame) # getting the probability for the amax class
+        softmax_list.sort(key=lambda x: x[1], reverse=True)
+        print(f"Picture {i}:\n{softmax_list}")
+        print()
+        
         i=i+1 # increment
 
     if key == ord('q') or key == ord('Q'):
