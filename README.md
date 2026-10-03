@@ -107,7 +107,7 @@ This is a multi-class classifier model, so it can only detect one card at a time
 
 ### Credits/ Sources:
 
-I started this project in my free time after researching CNNs and deep learning on Kaggle. I decided to turn it into a live demo for my high school Data Structures & Algorithms (DSA) class in December 2025. In October 2026, I made some minor additions before publishing on GitHub.
+I started this project in my free time after researching CNNs and deep learning on Kaggle. I decided to turn it into a live demo for my high school Data Science & Analytics (DSA) class in December 2025. In October 2026, I made some minor additions before publishing on GitHub.
 
 [Dataset](https://www.kaggle.com/datasets/gpiosenka/cards-image-datasetclassification)
 
