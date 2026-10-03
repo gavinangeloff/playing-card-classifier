@@ -98,7 +98,7 @@ print()
 
 #INTERACTIVE PART
 
-# takes an image and returns a class name
+# takes an image and returns the argmax, argmax class, and softmax list
 def predict_card(frame):
 
     # cv2.cvtColor() is an OpenCV function that converts an image from one color space to another.
@@ -130,7 +130,7 @@ def frame_setup(amax, frame):
     # ADDING TEXT
     font = cv2.FONT_HERSHEY_DUPLEX
     # org
-    org = (40, 600)
+    org = (40, frame.shape[0] - 35)
     # fontScale
     fontScale = 1
     # Blue color in BGR
@@ -170,9 +170,11 @@ while True:
 
         # Predict Class With Image
         amax, amax_class, softmax_list = predict_card(frame)
-        frame_setup(f"{amax_class}: {softmax_list[amax][1]:.3%}", frame) # getting the probability for the amax class
+        frame_setup(f"{amax_class}: {softmax_list[amax][1]:.1%}", frame) # getting the probability for the amax class
         softmax_list.sort(key=lambda x: x[1], reverse=True)
-        print(f"Picture {i}:\n{softmax_list}")
+        print(f"Picture {i}:")
+        for name, prob in softmax_list[:3]:
+            print(f"  {name}: {prob:.1%}")
         print()
         
         i=i+1 # increment
