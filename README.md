@@ -5,7 +5,7 @@
 ### A CNN built from scratch in PyTorch that recognizes all 53 playing cards (52 + joker) from a live webcam
 
 ## Results
-Weights from epoch 600, chosen by best validation accuracy
+I chose the 600 epoch version of the model because it had the highest validation accuracy, even though the validation loss was higher by that point and the model is arguably overfitted. As a result it is more confident about wrong answers.
 
 | Split | Accuracy |
 | :--- | :--- |
